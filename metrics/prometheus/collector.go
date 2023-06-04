@@ -19,9 +19,10 @@ package prometheus
 import (
 	"bytes"
 	"fmt"
-	"github.com/ethereum/go-ethereum/metrics"
 	"regexp"
 	"strconv"
+
+	"github.com/ethereum/go-ethereum/metrics"
 )
 
 var (
