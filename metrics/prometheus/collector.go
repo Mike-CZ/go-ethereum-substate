@@ -19,11 +19,9 @@ package prometheus
 import (
 	"bytes"
 	"fmt"
+	"github.com/ethereum/go-ethereum/metrics"
 	"regexp"
 	"strconv"
-	"strings"
-
-	"github.com/ethereum/go-ethereum/metrics"
 )
 
 var (
@@ -121,13 +119,16 @@ func mutateKey(key string) string {
 	// https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
 
 	// Define the regex pattern
-	pattern := `[a-zA-Z_:][a-zA-Z0-9_:]*`
+	pattern := `[^a-zA-Z0-9_:]`
 	regex := regexp.MustCompile(pattern)
 
-	// Split the input string by non-matching symbols
-	split := regex.Split(key, -1)
-
 	// Replace non-matching symbols with underscore
-	replaced := strings.Join(split, "_")
+	replaced := regex.ReplaceAllString(key, "_")
+
+	// Ensure the string starts with a valid character
+	if !regexp.MustCompile(`^[a-zA-Z_:]`).MatchString(replaced) {
+		replaced = "_" + replaced
+	}
+
 	return replaced
 }
