@@ -19,6 +19,7 @@ package prometheus
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -116,5 +117,17 @@ func (c *collector) writeSummaryPercentile(name, p string, value interface{}) {
 }
 
 func mutateKey(key string) string {
-	return strings.Replace(key, "/", "_", -1)
+	// Replace all non-matching symbols with underscore
+	// https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+
+	// Define the regex pattern
+	pattern := `[a-zA-Z_:][a-zA-Z0-9_:]*`
+	regex := regexp.MustCompile(pattern)
+
+	// Split the input string by non-matching symbols
+	split := regex.Split(key, -1)
+
+	// Replace non-matching symbols with underscore
+	replaced := strings.Join(split, "_")
+	return replaced
 }
